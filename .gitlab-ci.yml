@@ -1,0 +1,39 @@
+# Build and deploy the Analyst Workspace frontend to GitLab Pages
+default:
+  image: node:20-alpine
+
+stages:
+  - build
+  - deploy
+
+variables:
+  # GitLab Pages serves at https://<namespace>.gitlab.io/<project-path>/
+  # Vite uses this so assets and routes work correctly
+  VITE_BASE_URL: "/$CI_PROJECT_PATH/"
+
+build:
+  stage: build
+  script:
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - dist
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-npm
+    paths:
+      - node_modules/
+
+pages:
+  stage: deploy
+  dependencies:
+    - build
+  script:
+    - mv dist public
+    # SPA fallback: serve index.html for unknown paths so client-side routing works
+    - cp public/index.html public/404.html
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
