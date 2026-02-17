@@ -1,0 +1,61 @@
+@import 'tailwindcss';
+
+:root {
+  --color-surface: 248 250 252;
+  --color-border: 226 232 240;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar hide utility for rail/compact panels */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animations (Tailwind animate-in style) */
+@keyframes slide-in-from-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slide-in-from-top-1 {
+  from { transform: translateY(-4px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-in {
+  animation-duration: 200ms;
+  animation-fill-mode: both;
+}
+.slide-in-from-right {
+  animation-name: slide-in-from-right;
+}
+.slide-in-from-top-1 {
+  animation-name: slide-in-from-top-1;
+}
+.fade-in {
+  animation-name: fade-in;
+}
+.duration-300 {
+  animation-duration: 300ms;
+}
+.slide-in-from-right-4 {
+  animation-name: slide-in-from-right;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
