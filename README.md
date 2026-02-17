@@ -15,6 +15,13 @@ npm run dev
 - `npm run build` – production build
 - `npm run preview` – preview production build
 
+## Deployment
+
+Static build (`dist/`) is deployed automatically:
+
+- **GitLab Pages** – push to the default branch; CI builds and publishes to `https://<namespace>.gitlab.io/<project-path>/`.
+- **GitHub Pages** – push to `main`; the Actions workflow builds and deploys to `https://<user>.github.io/<repo>/`. Enable **Settings → Pages → Source: GitHub Actions** once.
+
 ## Routes
 
 - `/` – Home
