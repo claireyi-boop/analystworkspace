@@ -74,9 +74,6 @@ export function StreamArea({
         >
           <ChevronRight size={20} />
         </button>
-        <div className="writing-vertical-rl text-xs font-bold text-gray-400 uppercase tracking-wider rotate-180 select-none">
-          Results ({displayData.length})
-        </div>
       </div>
     )
   }
