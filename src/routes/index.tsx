@@ -4,7 +4,10 @@ import { Home } from '@/pages/Home'
 import { Dashboard } from '@/pages/Dashboard'
 import { Workspace } from '@/pages/Workspace'
 
-export const router = createBrowserRouter([
+const basePath = (import.meta.env.VITE_BASE_PATH ?? '/').replace(/\/+$/, '') || ''
+
+export const router = createBrowserRouter(
+  [
   {
     path: '/',
     element: <Layout />,
@@ -15,4 +18,6 @@ export const router = createBrowserRouter([
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
-])
+],
+  basePath ? { basename: basePath } : undefined
+)
