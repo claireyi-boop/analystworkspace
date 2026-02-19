@@ -1,0 +1,196 @@
+[
+  {
+    "id": "REV-GGL-1024",
+    "type": "review",
+    "channel": "Google Reviews",
+    "date": "Oct 12, 2025",
+    "sentiment": "Negative",
+    "nps": 1,
+    "category": "Service Speed",
+    "topic": "Drive-Thru",
+    "text": "Sat in the Drive-thru for 25 minutes just for a coffee. This is the slowest location in the city. The cars were backed up into the street.",
+    "attributes": {
+      "loyaltyTier": "New Customer",
+      "couponUsed": false,
+      "orderItem": "Coffee"
+    }
+  },
+  {
+    "id": "REV-GGL-1042",
+    "type": "review",
+    "channel": "Google Reviews",
+    "date": "Oct 12, 2025",
+    "sentiment": "Positive",
+    "nps": 5,
+    "category": "Product Quality",
+    "topic": "Super Onion Rings",
+    "text": "You guys finally nailed it with the Super Onion Rings! 🧅 They are huge and the batter actually stays on. Way better than the old ones. Don't ever change this recipe.",
+    "attributes": {
+      "loyaltyTier": "Gold Member",
+      "couponUsed": false,
+      "orderItem": "Super Onion Rings"
+    }
+  },
+  {
+    "id": "SUR-APP-5599",
+    "type": "survey",
+    "channel": "App",
+    "date": "Oct 11, 2025",
+    "sentiment": "Negative",
+    "nps": 2,
+    "category": "Product Quality",
+    "topic": "Super Onion Rings",
+    "text": "Ordered the new Super Onion Rings and they were a greasy mess. Completely soggy by the time I got home (5 min drive). Disappointed.",
+    "attributes": {
+      "loyaltyTier": "Silver Member",
+      "couponUsed": true,
+      "orderItem": "Super Onion Rings"
+    }
+  },
+  {
+    "id": "SOC-X-9901",
+    "type": "social",
+    "channel": "Twitter",
+    "date": "Oct 12, 2025",
+    "sentiment": "Negative",
+    "nps": null,
+    "category": "Mobile App",
+    "topic": "App Glitch",
+    "text": "Hey @NomNomExpress, your app is broken. 📱 Every time I try to remove pickles from the double burger, the whole app freezes. I just want my lunch! #bug #hungry",
+    "attributes": {
+      "loyaltyTier": "Unknown",
+      "couponUsed": false,
+      "orderItem": "Double Burger"
+    }
+  },
+  {
+    "id": "CALL-4217",
+    "type": "call",
+    "channel": "Phone",
+    "date": "9:03 PM Oct 1, 2025",
+    "duration": "04:12",
+    "sentiment": "Negative",
+    "nps": 1,
+    "category": "Billing",
+    "topic": "Coupons",
+    "rawText": "Customer called regarding Error 505 on coupon redemption and subsequent overcharge.",
+    "attributes": {
+      "loyaltyTier": "Gold Member",
+      "couponUsed": true,
+      "orderItem": "Family Bundle",
+      "emotion": "Frustration"
+    },
+    "transcript": [
+      { "time": "00:15", "speaker": "Agent (Bree Anderson)", "type": "agent", "text": "Thank you for calling Nom Nom Support. My name is Bree. Can I get your order number?" },
+      { "time": "00:22", "speaker": "Customer (Jon Kern)", "type": "customer", "text": "Yes, it's NNE-199-B7. I'm looking at my bank statement right now and I am not happy." },
+      { "time": "00:30", "speaker": "Agent (Bree Anderson)", "type": "agent", "text": "Okay, I see the order here. How can I help you with it?" },
+      { "time": "00:45", "speaker": "Customer (Jon Kern)", "type": "customer", "text": "I used the 'Family Feast' BOGO coupon in the app. It said 'Applied' on the checkout screen, but then I got an Error 505 pop-up. I checked my bank, and I was charged the full $45 instead of the discounted price." },
+      { "time": "01:05", "speaker": "Agent (Bree Anderson)", "type": "agent", "text": "I apologize for that inconvenience. It looks like our system didn't recognize code 505 at the final transaction step. It's a known issue we are patching." },
+      { "time": "01:15", "speaker": "Customer (Jon Kern)", "type": "customer", "text": "Well, I need that refunded. That's a $20 difference. I wouldn't have ordered this much food without the coupon." },
+      { "time": "01:30", "speaker": "Agent (Bree Anderson)", "type": "agent", "text": "I completely understand. Let me process a partial refund for the difference right now. It should appear in 3-5 business days." }
+    ]
+  },
+  {
+    "id": "CALL-5502",
+    "type": "call",
+    "channel": "Phone",
+    "date": "12:15 PM Oct 12, 2025",
+    "duration": "08:45",
+    "sentiment": "Negative",
+    "nps": 0,
+    "category": "Order Accuracy",
+    "topic": "Missing Items",
+    "rawText": "Customer received incorrect order via delivery. Missing main entrees and Super Onion Rings.",
+    "attributes": {
+      "loyaltyTier": "Platinum",
+      "couponUsed": false,
+      "orderItem": "Super Onion Rings",
+      "emotion": "Anger"
+    },
+    "transcript": [
+      { "time": "00:05", "speaker": "Agent (Michael T.)", "type": "agent", "text": "Nom Nom Customer Care, Michael speaking." },
+      { "time": "00:10", "speaker": "Customer", "type": "customer", "text": "Hi, I just received my delivery order #4492 and it is completely wrong. Half the bags are missing." },
+      { "time": "00:20", "speaker": "Agent (Michael T.)", "type": "agent", "text": "I am so sorry to hear that. Can you tell me exactly what items you did receive?" },
+      { "time": "00:35", "speaker": "Customer", "type": "customer", "text": "I got the drinks and the kids' meals. But the two Spicy Chicken Sandwiches and the large order of Super Onion Rings are nowhere to be found. The receipt on the bag lists them, but they aren't inside." },
+      { "time": "00:50", "speaker": "Agent (Michael T.)", "type": "agent", "text": "That is frustrating, especially regarding the main entrees. Did the bag appear tampered with?" },
+      { "time": "01:00", "speaker": "Customer", "type": "customer", "text": "No, the seal was intact. The store just didn't pack it. This happened last time too. I paid extra for those onion rings!" },
+      { "time": "01:20", "speaker": "Agent (Michael T.)", "type": "agent", "text": "I see you are a Platinum member, and I really appreciate your loyalty despite this error. Since this was a delivery, I can issue a full refund for the missing items plus a $15 credit for your next order." },
+      { "time": "01:35", "speaker": "Customer", "type": "customer", "text": "I guess that works, but now I have to figure out lunch for myself. Please tell the store on 5th street to check their bags." }
+    ]
+  },
+  {
+    "id": "CALL-6110",
+    "type": "call",
+    "channel": "Phone",
+    "date": "6:30 PM Oct 11, 2025",
+    "duration": "05:20",
+    "sentiment": "Negative",
+    "nps": 3,
+    "category": "Service Speed",
+    "topic": "Drive-Thru",
+    "rawText": "Customer trapped in drive-thru line for over 30 minutes. Requesting complaint be filed against store manager.",
+    "attributes": {
+      "loyaltyTier": "New Customer",
+      "couponUsed": false,
+      "orderItem": "N/A",
+      "emotion": "Urgency"
+    },
+    "transcript": [
+      { "time": "00:05", "speaker": "Agent (Sarah L.)", "type": "agent", "text": "Support line, Sarah speaking." },
+      { "time": "00:08", "speaker": "Customer", "type": "customer", "text": "I am currently sitting in your drive-thru at the downtown location and I have not moved in 20 minutes." },
+      { "time": "00:15", "speaker": "Agent (Sarah L.)", "type": "agent", "text": "Oh no, I apologize for the wait. Is the line moving at all?" },
+      { "time": "00:20", "speaker": "Customer", "type": "customer", "text": "No. There are curbs on both sides so I can't even drive out. I'm literally trapped here. I can see the staff inside just standing around talking. This is unacceptable." },
+      { "time": "00:35", "speaker": "Agent (Sarah L.)", "type": "agent", "text": "That definitely sounds concerning. Let me try to contact the store manager directly on the other line to see what is holding up the queue." },
+      { "time": "00:50", "speaker": "Customer", "type": "customer", "text": "Please do. People are honking their horns. It's chaos out here. I just wanted a quick snack and now I'm late for a meeting." },
+      { "time": "01:45", "speaker": "Agent (Sarah L.)", "type": "agent", "text": "Sir, I just spoke to the manager. Apparently, their POS system went down and they are rebooting it. They should be moving cars manually in a moment." }
+    ]
+  },
+  {
+    "id": "REV-GGL-2022",
+    "type": "review",
+    "channel": "Google Reviews",
+    "date": "Oct 12, 2025",
+    "sentiment": "Neutral",
+    "nps": 7,
+    "category": "Product Quality",
+    "topic": "Super Onion Rings",
+    "text": "The Super Onion Rings are huge! Taste is great, but they are a bit too salty for my taste. Good value for the size though.",
+    "attributes": {
+      "loyaltyTier": "Bronze Member",
+      "couponUsed": false,
+      "orderItem": "Super Onion Rings"
+    }
+  },
+  {
+    "id": "SUR-APP-7712",
+    "type": "survey",
+    "channel": "App",
+    "date": "Oct 10, 2025",
+    "sentiment": "Negative",
+    "nps": 1,
+    "category": "Order Accuracy",
+    "topic": "Wrong Item",
+    "text": "I specifically ordered the VEGAN burger. I took a bite and it was clearly beef. I have been a vegetarian for 10 years. This is a serious health and safety issue.",
+    "attributes": {
+      "loyaltyTier": "New Customer",
+      "couponUsed": false,
+      "orderItem": "Vegan Burger"
+    }
+  },
+  {
+    "id": "SOC-IG-5541",
+    "type": "social",
+    "channel": "Instagram",
+    "date": "Oct 11, 2025",
+    "sentiment": "Negative",
+    "nps": null,
+    "category": "Service Speed",
+    "topic": "Drive-Thru",
+    "text": "Avoid the Westside location! 🛑 Stuck in the drive-thru for 40 mins. They ran out of fries AND ice cream. #fail #nomnomexpress",
+    "attributes": {
+      "loyaltyTier": "Unknown",
+      "couponUsed": false,
+      "orderItem": "Ice Cream"
+    }
+  }
+]

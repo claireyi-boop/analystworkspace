@@ -1,34 +1,8 @@
 import { useState } from 'react'
-import {
-  Smartphone,
-  Twitter,
-  Globe,
-  Phone,
-  MessageSquare,
-  ChevronRight,
-  ChevronLeft,
-  Bookmark,
-  Minimize2,
-  Maximize2,
-} from 'lucide-react'
-import { WORD_CLOUD } from '@/data/mockInteractions'
+import { ChevronLeft, ChevronRight, Minimize2, Maximize2 } from 'lucide-react'
 import type { CustomerInteraction } from '@/types'
 import type { ActiveFilter } from '@/types'
-
-function getChannelIcon(channel: string) {
-  switch (channel) {
-    case 'App':
-      return <Smartphone size={14} className="text-blue-500" />
-    case 'Social Media':
-      return <Twitter size={14} className="text-sky-500" />
-    case 'Google Reviews':
-      return <Globe size={14} className="text-green-600" />
-    case 'Phone':
-      return <Phone size={14} className="text-purple-500" />
-    default:
-      return <MessageSquare size={14} className="text-gray-500" />
-  }
-}
+import { InteractionCard } from './InteractionCard'
 
 interface StreamAreaProps {
   data: CustomerInteraction[]
@@ -39,16 +13,18 @@ interface StreamAreaProps {
   isExpanded?: boolean
   collectionItems: CustomerInteraction[]
   onAddToCollection: (item: CustomerInteraction, highlightedText?: string | null) => void
-  onRemoveFromCollection: (id: number) => void
+  onRemoveFromCollection: (id: number | string) => void
   isCompact?: boolean
   isCollapsed?: boolean
   onToggleCollapse?: () => void
+  /** Search query to highlight in card text (e.g. debounced search). */
+  searchHighlight?: string
 }
 
 export function StreamArea({
   data,
-  activeFilters,
-  onToggleFilter,
+  activeFilters: _activeFilters,
+  onToggleFilter: _onToggleFilter,
   onSelect,
   onExpand,
   isExpanded,
@@ -58,6 +34,7 @@ export function StreamArea({
   isCompact = false,
   isCollapsed = false,
   onToggleCollapse,
+  searchHighlight = '',
 }: StreamAreaProps) {
   const [activeTab, setActiveTab] = useState<'stream' | 'collections'>('stream')
 
@@ -123,25 +100,6 @@ export function StreamArea({
                 </span>
               </button>
             </div>
-
-            {activeTab === 'stream' && (
-              <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-                {WORD_CLOUD.map((w) => (
-                  <button
-                    key={w.text}
-                    type="button"
-                    onClick={() => onToggleFilter('Topic', w.text)}
-                    className={`text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap ${
-                      activeFilters.some((f) => f.type === 'Topic' && f.value === w.text)
-                        ? 'bg-blue-100 border-blue-300 text-blue-700 font-bold'
-                        : 'bg-gray-50 border-gray-200 text-gray-500 hover:bg-gray-100'
-                    }`}
-                  >
-                    {w.text}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
         ) : (
           <div className="flex items-center gap-2">
@@ -177,87 +135,17 @@ export function StreamArea({
 
       <div className={`flex-grow overflow-y-auto ${isCompact ? 'p-2 space-y-2' : 'p-6 space-y-3'}`}>
         {displayData.map((item) => (
-          <div
-            key={item.id}
-            role="button"
-            tabIndex={0}
-            onClick={() => onSelect(item)}
-            className="bg-white rounded-lg border border-gray-200 hover:shadow-md hover:border-blue-300 cursor-pointer transition-all group p-4"
-          >
-            <div className="flex justify-between items-start mb-2">
-              <div className="flex items-center gap-2">
-                {getChannelIcon(item.channel)}
-                {!isCompact && (
-                  <span className="text-xs font-bold text-gray-500 uppercase">
-                    {item.channel} • {item.category}
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">{item.date}</span>
-                {!isCompact && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      if (activeTab === 'stream') {
-                        onAddToCollection(
-                          item,
-                          item.type === 'call' ? item.transcript : item.text
-                        )
-                      } else {
-                        onRemoveFromCollection(item.id)
-                      }
-                    }}
-                    className={`p-1.5 rounded-full hover:bg-gray-100 transition-colors ${
-                      activeTab === 'collections' ||
-                      collectionItems.some((i) => i.id === item.id)
-                        ? 'text-blue-600 fill-blue-600'
-                        : 'text-gray-300 hover:text-blue-500'
-                    }`}
-                  >
-                    <Bookmark
-                      size={14}
-                      fill={
-                        activeTab === 'collections' ||
-                        collectionItems.some((i) => i.id === item.id)
-                          ? 'currentColor'
-                          : 'none'
-                      }
-                    />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {!isCompact && (
-              <p className="text-gray-800 text-sm font-medium line-clamp-2 mb-3">
-                {item.type === 'call' ? item.transcript : item.text}
-              </p>
-            )}
-
-            <div className="flex items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-              <div
-                className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                  item.sentiment === 'Negative'
-                    ? 'bg-red-100 text-red-700'
-                    : item.sentiment === 'Positive'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 text-gray-700'
-                }`}
-              >
-                {item.sentiment}
-              </div>
-              {item.nps !== undefined && item.nps !== null && !isCompact && (
-                <div className="text-xs text-gray-500 font-medium">NPS: {item.nps}</div>
-              )}
-              {!isCompact && (
-                <div className="ml-auto text-blue-600 text-xs font-bold flex items-center gap-1">
-                  Read <ChevronRight size={12} />
-                </div>
-              )}
-            </div>
-          </div>
+          <InteractionCard
+            key={String(item.id)}
+            item={item}
+            isCompact={isCompact}
+            isInCollection={collectionItems.some((i) => i.id === item.id)}
+            activeTab={activeTab}
+            onSelect={onSelect}
+            onAddToCollection={onAddToCollection}
+            onRemoveFromCollection={onRemoveFromCollection}
+            searchHighlight={searchHighlight}
+          />
         ))}
         {displayData.length === 0 && (
           <div className="text-center py-20 text-gray-400">

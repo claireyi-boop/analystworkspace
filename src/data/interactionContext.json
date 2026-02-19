@@ -1,0 +1,51 @@
+{
+  "chapters": {
+    "CALL-4217": [
+      { "timestamp": "00:45", "title": "Issue identification", "summary": "Customer reports Error 505 on BOGO coupon and full charge of $45 instead of discounted price." },
+      { "timestamp": "01:05", "title": "Agent response", "summary": "Agent acknowledges system did not recognize code 505 at final transaction; known issue being patched." },
+      { "timestamp": "01:30", "title": "Resolution", "summary": "Agent processes partial refund for the difference; 3-5 business days." }
+    ],
+    "CALL-5502": [
+      { "timestamp": "00:10", "title": "Issue identification", "summary": "Customer received delivery order #4492 with half the bags missing; receipt lists items not in bag." },
+      { "timestamp": "00:35", "title": "Missing items", "summary": "Two Spicy Chicken Sandwiches and large Super Onion Rings missing; bag seal intact." },
+      { "timestamp": "01:20", "title": "Resolution", "summary": "Agent issues full refund for missing items plus $15 credit; will notify store on 5th street." }
+    ],
+    "CALL-6110": [
+      { "timestamp": "00:08", "title": "Issue identification", "summary": "Customer trapped in drive-thru at downtown location; has not moved in 20 minutes." },
+      { "timestamp": "00:20", "title": "Escalation", "summary": "Customer cannot exit due to curbs; staff visible inside; situation unacceptable." },
+      { "timestamp": "01:45", "title": "Resolution", "summary": "Agent contacted manager; POS system down and rebooting; cars will move manually shortly." }
+    ]
+  },
+  "topics": {
+    "CALL-4217": [
+      { "model": "Billing", "heading": "Coupons & Promotions", "tags": [{ "label": "App Error 505", "count": 1 }, { "label": "Refund", "count": 1 }] },
+      { "model": "Customer Emotion", "tags": [{ "label": "Frustration", "count": 1 }] }
+    ],
+    "CALL-5502": [
+      { "model": "Order Fulfillment", "heading": "Delivery", "tags": [{ "label": "Missing Items", "count": 1 }, { "label": "Order Accuracy", "count": 1 }] },
+      { "model": "Customer Emotion", "tags": [{ "label": "Anger", "count": 1 }] }
+    ],
+    "CALL-6110": [
+      { "model": "Operations", "heading": "Drive-Thru", "tags": [{ "label": "Wait Time", "count": 1 }, { "label": "POS Outage", "count": 1 }] },
+      { "model": "Customer Emotion", "tags": [{ "label": "Urgency", "count": 1 }] }
+    ]
+  },
+  "metadata": {
+    "CALL-4217": {
+      "emotion": "Frustration",
+      "orderId": "NNE-199-B7",
+      "responseId": "CALL-4217",
+      "dateCreated": "9:03 PM Oct 1, 2025"
+    },
+    "CALL-5502": {
+      "emotion": "Anger",
+      "responseId": "CALL-5502",
+      "dateCreated": "12:15 PM Oct 12, 2025"
+    },
+    "CALL-6110": {
+      "emotion": "Urgency",
+      "responseId": "CALL-6110",
+      "dateCreated": "6:30 PM Oct 11, 2025"
+    }
+  }
+}

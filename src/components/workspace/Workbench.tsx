@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { ArrowLeft, Database, Settings, Layout, Columns } from 'lucide-react'
 import { SmartShelf } from './SmartShelf'
 import { ChartArea } from './ChartArea'
@@ -7,12 +7,35 @@ import { StreamArea } from './StreamArea'
 import { InteractionContextToolbar } from './InteractionContextToolbar'
 import { FocusDrawer } from './FocusDrawer'
 import { ALL_DATA } from '@/data/mockInteractions'
-import type { CustomerInteraction } from '@/types'
-import type { ActiveFilter } from '@/types'
+import type { CustomerInteraction, CallTranscript } from '@/types'
+import type { ActiveFilter, GlobalFilter } from '@/types'
+
+function getSearchableTranscript(d: CustomerInteraction): string {
+  if (d.type !== 'call') return ''
+  const call = d as CallTranscript
+  if (typeof call.transcript === 'string') return call.transcript
+  if (Array.isArray(call.transcript))
+    return call.transcript.map((t) => t.text).filter(Boolean).join(' ')
+  return call.rawText ?? ''
+}
+
+function getSearchableText(d: CustomerInteraction): string {
+  const text = d.type === 'call' ? getSearchableTranscript(d) : (d as { text?: string }).text ?? ''
+  const meta = [d.category, d.topic, d.channel, d.sentiment].filter(Boolean).join(' ')
+  return `${text} ${meta}`.toLowerCase()
+}
+import { TopToolBar } from './TopToolBar'
+
+const DEFAULT_DASHBOARD_FILTERS: GlobalFilter[] = [
+  { id: 'survey-meta', type: 'Dataset', value: 'Survey metadata' },
+  { id: 'call-meta', type: 'Dataset', value: 'Call metadata' },
+  { id: 'social-ch', type: 'Dataset', value: 'Social channels' },
+]
 
 interface WorkbenchProps {
   entryMode: 'widget' | 'feedback' | 'segment'
   initialFilter?: ActiveFilter | null
+  initialGlobalFilters?: GlobalFilter[]
   focusOnData?: boolean
   onBack: () => void
 }
@@ -20,12 +43,19 @@ interface WorkbenchProps {
 export function Workbench({
   entryMode,
   initialFilter,
+  initialGlobalFilters = [],
   focusOnData = false,
   onBack,
 }: WorkbenchProps) {
-  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(
-    initialFilter ? [initialFilter] : []
-  )
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([])
+  const [globalFilters, setGlobalFilters] = useState<GlobalFilter[]>(() => {
+    const fromDashboard =
+      initialGlobalFilters.length > 0 ? initialGlobalFilters : DEFAULT_DASHBOARD_FILTERS
+    const fromDrill = initialFilter
+      ? [{ id: 'initial', type: initialFilter.type, value: initialFilter.value }]
+      : []
+    return [...fromDashboard, ...fromDrill]
+  })
   const [selectedItem, setSelectedItem] = useState<CustomerInteraction | null>(null)
   const [notebookItems, setNotebookItems] = useState<CustomerInteraction[]>([])
 
@@ -33,6 +63,13 @@ export function Workbench({
   const [activeTab, setActiveTab] = useState<'viz' | 'data'>(focusOnData ? 'data' : 'viz')
   const [isSplitExpanded, setIsSplitExpanded] = useState(focusOnData)
   const [streamCollapsed, setStreamCollapsed] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearchQuery(searchQuery), 1500)
+    return () => clearTimeout(t)
+  }, [searchQuery])
 
   const isFeedbackMode = entryMode === 'feedback'
   const isReading = selectedItem !== null
@@ -48,19 +85,17 @@ export function Workbench({
     return 'w-full'
   }
 
+  const hasCategoryFilter = activeFilters.some((f) => f.type === 'Category') ||
+    globalFilters.some((f) => f.type === 'Category')
   const showFacetRibbon = useMemo(() => {
     if (layoutMode === 'tabs' && activeTab === 'data') return true
-    if (
-      layoutMode === 'split' &&
-      (isFeedbackMode || activeFilters.some((f) => f.type === 'Category'))
-    )
-      return true
+    if (layoutMode === 'split' && (isFeedbackMode || hasCategoryFilter)) return true
     return false
-  }, [layoutMode, activeTab, isFeedbackMode, activeFilters])
+  }, [layoutMode, activeTab, isFeedbackMode, hasCategoryFilter])
 
-  const filteredData = useMemo(() => {
-    let result = [...ALL_DATA]
-    activeFilters.forEach((filter) => {
+  const applyFilters = (data: CustomerInteraction[], filters: { type: string; value: string }[]) => {
+    let result = [...data]
+    filters.forEach((filter) => {
       if (filter.type === 'Category') {
         result = result.filter(
           (d) => d.category.toLowerCase() === filter.value.toLowerCase()
@@ -75,7 +110,7 @@ export function Workbench({
           result = result.filter(
             (d) =>
               (d as { text?: string }).text?.toLowerCase().includes('wait') ||
-              (d as { transcript?: string }).transcript?.toLowerCase().includes('wait')
+              getSearchableTranscript(d).toLowerCase().includes('wait')
           )
         else
           result = result.filter((d) =>
@@ -97,12 +132,24 @@ export function Workbench({
           (d) =>
             d.topic === 'Coupons' ||
             (d as { text?: string }).text?.toLowerCase().includes('coupon') ||
-            (d as { transcript?: string }).transcript?.toLowerCase().includes('coupon')
+            getSearchableTranscript(d).toLowerCase().includes('coupon')
         )
       }
     })
     return result
-  }, [activeFilters])
+  }
+
+  const filteredData = useMemo(() => {
+    const afterGlobal = applyFilters(ALL_DATA, globalFilters)
+    const afterActive = applyFilters(afterGlobal, activeFilters)
+    const q = debouncedSearchQuery.trim().toLowerCase()
+    if (!q) return afterActive
+    return afterActive.filter((d) => getSearchableText(d).includes(q))
+  }, [activeFilters, globalFilters, debouncedSearchQuery])
+
+  const removeGlobalFilter = (id: string) => {
+    setGlobalFilters(globalFilters.filter((f) => f.id !== id))
+  }
 
   const toggleFilter = (type: string, value: string) => {
     const exists = activeFilters.find((f) => f.type === type && f.value === value)
@@ -128,7 +175,7 @@ export function Workbench({
     }
   }
 
-  const removeFromNotebook = (id: number) => {
+  const removeFromNotebook = (id: number | string) => {
     setNotebookItems(notebookItems.filter((i) => i.id !== id))
   }
 
@@ -184,6 +231,16 @@ export function Workbench({
         </div>
       </div>
 
+      <TopToolBar
+        activeFilters={activeFilters}
+        onToggleFilter={toggleFilter}
+        globalFilters={globalFilters}
+        onRemoveGlobalFilter={removeGlobalFilter}
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search interactions..."
+      />
+
       <div className="flex-grow flex overflow-hidden">
         <SmartShelf
           activeFilters={activeFilters}
@@ -221,6 +278,7 @@ export function Workbench({
               <div className="flex-grow flex overflow-hidden relative">
                 {activeTab === 'viz' && (
                   <ChartArea
+                    data={filteredData}
                     activeFilters={activeFilters}
                     onToggleFilter={toggleFilter}
                     onBarClick={handleBarClick}
@@ -250,6 +308,7 @@ export function Workbench({
                           isCompact={isCompactStream}
                           isCollapsed={streamCollapsed}
                           onToggleCollapse={() => setStreamCollapsed(!streamCollapsed)}
+                          searchHighlight={debouncedSearchQuery}
                         />
                       </div>
                       {isReading && selectedItem && (
@@ -261,6 +320,7 @@ export function Workbench({
                               onClose={() => setSelectedItem(null)}
                               onAddToNotebook={addToNotebook}
                               isInline
+                              searchHighlight={debouncedSearchQuery}
                             />
                           </div>
                         </>
@@ -277,6 +337,7 @@ export function Workbench({
               {!isSplitExpanded && !isReading && (
                 <div className="h-1/2 border-b border-gray-200">
                   <ChartArea
+                    data={filteredData}
                     activeFilters={activeFilters}
                     onToggleFilter={toggleFilter}
                     onBarClick={handleBarClick}
@@ -301,6 +362,7 @@ export function Workbench({
                       isCompact={isCompactStream}
                       isCollapsed={streamCollapsed}
                       onToggleCollapse={() => setStreamCollapsed(!streamCollapsed)}
+                      searchHighlight={debouncedSearchQuery}
                     />
                   </div>
                   {isReading && selectedItem && (
@@ -312,6 +374,7 @@ export function Workbench({
                           onClose={() => setSelectedItem(null)}
                           onAddToNotebook={addToNotebook}
                           isInline
+                          searchHighlight={debouncedSearchQuery}
                         />
                       </div>
                     </>

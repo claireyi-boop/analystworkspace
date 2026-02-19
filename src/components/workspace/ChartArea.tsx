@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import {
   BarChart,
   Bar,
@@ -11,18 +12,36 @@ import {
 import { X } from 'lucide-react'
 import { CHART_DATA_MAPPED } from '@/data/mockInteractions'
 import type { ActiveFilter } from '@/types'
+import type { CustomerInteraction } from '@/types'
 
 interface ChartAreaProps {
   activeFilters: ActiveFilter[]
   onToggleFilter: (type: string, value: string) => void
   onBarClick?: (name: string) => void
+  /** When provided, chart shows volume by category from this data (e.g. search/filtered results). */
+  data?: CustomerInteraction[]
 }
+
+const DEFAULT_COLOR = '#ef4444'
 
 export function ChartArea({
   activeFilters,
   onToggleFilter,
   onBarClick,
+  data,
 }: ChartAreaProps) {
+  const chartData = useMemo(() => {
+    if (data == null || data.length === 0) return CHART_DATA_MAPPED
+    const byCategory: Record<string, number> = {}
+    data.forEach((d) => {
+      const name = d.category
+      byCategory[name] = (byCategory[name] ?? 0) + 1
+    })
+    return Object.entries(byCategory)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({ name, count, color: DEFAULT_COLOR }))
+  }, [data])
+
   return (
     <div className="h-full w-full bg-white p-6 relative flex flex-col">
       <div className="flex justify-between items-center mb-4 flex-shrink-0">
@@ -50,7 +69,7 @@ export function ChartArea({
 
       <div className="flex-grow min-h-0">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={CHART_DATA_MAPPED}>
+          <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
             <YAxis axisLine={false} tickLine={false} />
@@ -63,7 +82,7 @@ export function ChartArea({
               }
               style={{ cursor: 'pointer' }}
             >
-              {CHART_DATA_MAPPED.map((entry, index) => {
+              {chartData.map((entry, index) => {
                 const isSelected = activeFilters.some(
                   (f) => f.type === 'Category' && f.value === entry.name
                 )

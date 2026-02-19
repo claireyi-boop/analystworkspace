@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   ResponsiveContainer,
@@ -6,7 +7,6 @@ import {
   Cell,
 } from 'recharts'
 import {
-  Filter,
   Search,
   Sliders,
   Edit3,
@@ -19,13 +19,14 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import { WidgetCard } from '@/components/dashboard/WidgetCard'
+import { DashboardFilterBar } from '@/components/dashboard/DashboardFilterBar'
 import {
   ISSUES_DATA,
   STRENGTHS_DATA,
   FEEDBACK_DATA,
   SENTIMENT_DATA,
 } from '@/data/mockInteractions'
-import type { IssuesRow } from '@/types'
+import type { IssuesRow, GlobalFilter } from '@/types'
 
 // Rating breakdown widget content
 function RatingBreakdownContent() {
@@ -183,11 +184,27 @@ function CustomerFeedbackContent() {
   )
 }
 
+const DEFAULT_DASHBOARD_FILTERS: GlobalFilter[] = [
+  { id: 'survey-meta', type: 'Dataset', value: 'Survey metadata' },
+  { id: 'call-meta', type: 'Dataset', value: 'Call metadata' },
+  { id: 'social-ch', type: 'Dataset', value: 'Social channels' },
+]
+
 export function Dashboard() {
   const navigate = useNavigate()
+  const [dashboardFilters, setDashboardFilters] = useState<GlobalFilter[]>(DEFAULT_DASHBOARD_FILTERS)
 
   const handleDrillToWorkspace = (widgetId: string, filter?: { type: string; value: string }) => {
-    navigate(`/workspace/${widgetId}`, { state: filter ? { initialFilter: filter } : undefined })
+    navigate(`/workspace/${widgetId}`, {
+      state: {
+        ...(filter ? { initialFilter: filter } : {}),
+        dashboardFilters: dashboardFilters,
+      },
+    })
+  }
+
+  const removeDashboardFilter = (id: string) => {
+    setDashboardFilters((prev) => prev.filter((f) => f.id !== id))
   }
 
   return (
@@ -198,25 +215,14 @@ export function Dashboard() {
           <h1 className="text-xl font-normal text-gray-800 mr-4">
             Nom nom express CX <ChevronDown size={14} className="inline ml-1 text-gray-400" />
           </h1>
-          <div className="flex items-center gap-2 border-l border-gray-200 pl-4">
-            <Filter size={14} className="text-gray-500 mr-2" />
-            <span className="text-sm text-gray-600 font-medium">Filters</span>
-            <div className="flex items-center gap-2 ml-2">
-              <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs rounded-full border border-blue-100 font-medium flex items-center gap-1">
-                Survey metadata <ChevronDown size={10} />
-              </span>
-              <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs rounded-full border border-blue-100 font-medium flex items-center gap-1">
-                Call metadata <ChevronDown size={10} />
-              </span>
-              <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs rounded-full border border-blue-100 font-medium flex items-center gap-1">
-                Social channels <ChevronDown size={10} />
-              </span>
-            </div>
-          </div>
+          <DashboardFilterBar
+            filters={dashboardFilters}
+            onRemoveFilter={removeDashboardFilter}
+          />
         </div>
         <div className="flex items-center gap-3 text-gray-400">
           <span className="text-xs font-medium text-blue-600 flex items-center gap-1 cursor-pointer mr-2">
-            <Sliders size={12} /> Hide Filters (3)
+            <Sliders size={12} /> Hide Filters ({dashboardFilters.length})
           </span>
           <Edit3 size={18} className="cursor-pointer hover:text-gray-600" />
           <Settings size={18} className="cursor-pointer hover:text-gray-600" />

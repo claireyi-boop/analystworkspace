@@ -10,7 +10,8 @@ import {
   Plus,
   MoreVertical,
 } from 'lucide-react'
-import type { CustomerInteraction } from '@/types'
+import type { CustomerInteraction, CallTranscript, TranscriptEntry } from '@/types'
+import { highlightMatches } from '@/utils/highlight'
 
 function getChannelIcon(channel: string) {
   switch (channel) {
@@ -39,11 +40,20 @@ function getInteractionTitle(item: CustomerInteraction): string {
   return `${typeLabel} - ${item.id}`
 }
 
+function getCallTranscriptText(item: CallTranscript): string {
+  if (typeof item.transcript === 'string') return item.transcript
+  if (Array.isArray(item.transcript))
+    return item.transcript.map((t) => `${t.speaker}: ${t.text}`).join('\n\n')
+  return item.rawText ?? ''
+}
+
 interface FocusDrawerProps {
   item: CustomerInteraction
   onClose: () => void
   onAddToNotebook: (item: CustomerInteraction, highlightedText?: string | null) => void
   isInline?: boolean
+  /** Search query to highlight in transcript/text. */
+  searchHighlight?: string
 }
 
 export function FocusDrawer({
@@ -51,12 +61,12 @@ export function FocusDrawer({
   onClose,
   onAddToNotebook,
   isInline = false,
+  searchHighlight = '',
 }: FocusDrawerProps) {
-  const [highlighted, setHighlighted] = useState(false)
   const [activeTab, setActiveTab] = useState<'interaction' | 'tickets' | 'history'>('interaction')
 
-  const handleSimulatedHighlight = () => setHighlighted(true)
-  const textContent = item.type === 'call' ? item.transcript : item.text
+  const textContent =
+    item.type === 'call' ? getCallTranscriptText(item as CallTranscript) : item.text
   const title = getInteractionTitle(item)
 
   const tabs = [
@@ -102,7 +112,7 @@ export function FocusDrawer({
             </div>
             <div>
               <h2 className="font-semibold text-gray-800">{title}</h2>
-              <p className="text-xs text-gray-500">{item.date} · 9:03 PM</p>
+              <p className="text-xs text-gray-500">{item.date}</p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -154,81 +164,70 @@ export function FocusDrawer({
 
               {item.type === 'call' ? (
                 <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-gray-500 mb-0.5">00:45 · Agent (Bree Anderson)</p>
-                      <div className="bg-gray-50 rounded-lg px-4 py-3 text-sm text-gray-800">
-                        Thank you for waiting. My name is Bree. Can I get your order number?
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-200 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-gray-500 mb-0.5">00:55 · Customer (Jon Kern)</p>
-                      <div className="bg-blue-50 rounded-lg px-4 py-3 text-sm text-gray-800 border-l-2 border-blue-300">
-                        Yes, the order number is NNE-199-B7. I went through the drive-thru and my
-                        order was missing an item. I was charged for it, but it&apos;s not in the
-                        bag.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-gray-500 mb-0.5">01:18 · Agent (Bree Anderson)</p>
-                      <div className="bg-gray-50 rounded-lg px-4 py-3 text-sm text-gray-800">
-                        Okay. Which item was missing?
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    className="flex gap-3 relative group cursor-text"
-                    onClick={handleSimulatedHighlight}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <div className="w-8 h-8 rounded-full bg-blue-200 flex-shrink-0" />
-                    <div className="flex-1 min-w-0 border-l-2 border-blue-400">
-                      <p className="text-xs text-gray-500 mb-0.5">01:18 · Customer (Jon Kern)</p>
-                      <div
-                        className={`bg-blue-50 rounded-lg px-4 py-3 text-sm text-gray-800 transition-colors ${
-                          highlighted ? 'ring-2 ring-yellow-400' : ''
-                        }`}
-                      >
-                        The Chicken Fiesta Bowl is completely missing. I was charged $9 for it! And
-                        the large soda I got is completely flat—no bubbles at all.
-                      </div>
-                      {highlighted && (
-                        <div
-                          className="mt-2 inline-flex items-center gap-1.5 bg-slate-800 text-white text-xs px-3 py-1.5 rounded shadow-lg cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            onAddToNotebook(item, item.transcript)
-                            setHighlighted(false)
-                          }}
-                          role="button"
-                          tabIndex={0}
-                        >
-                          <Plus size={12} /> Add to Notebook
+                  {(() => {
+                    const call = item as CallTranscript
+                    const entries: TranscriptEntry[] =
+                      typeof call.transcript === 'string'
+                        ? []
+                        : Array.isArray(call.transcript)
+                          ? call.transcript
+                          : []
+                    if (entries.length === 0) {
+                      return (
+                        <div className="bg-gray-50 rounded-lg px-4 py-4 text-sm text-gray-800 leading-relaxed border-l-2 border-gray-200 whitespace-pre-wrap">
+                          {highlightMatches(getCallTranscriptText(call), searchHighlight)}
                         </div>
-                      )}
-                    </div>
-                  </div>
+                      )
+                    }
+                    return entries.map((entry, i) => {
+                      const isCustomer = entry.type === 'customer'
+                      return (
+                        <div key={`${entry.time}-${i}`} className="flex gap-3">
+                          <div
+                            className={`w-8 h-8 rounded-full flex-shrink-0 ${
+                              isCustomer ? 'bg-blue-200' : 'bg-gray-200'
+                            }`}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-gray-500 mb-0.5">
+                              {entry.time} · {entry.speaker}
+                            </p>
+                            <div
+                              className={`rounded-lg px-4 py-3 text-sm text-gray-800 ${
+                                isCustomer
+                                  ? 'bg-blue-50 border-l-2 border-blue-300'
+                                  : 'bg-gray-50'
+                              }`}
+                            >
+                              {highlightMatches(entry.text, searchHighlight)}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })
+                  })()}
                 </div>
               ) : (
                 <div className="bg-gray-50 rounded-lg px-4 py-4 text-sm text-gray-800 leading-relaxed border-l-2 border-gray-200">
-                  &quot;{textContent}&quot;
+                  &quot;{highlightMatches(textContent, searchHighlight)}&quot;
                 </div>
               )}
 
-              {!highlighted && item.type === 'call' && (
-                <div className="mt-6 p-4 bg-blue-50 text-blue-800 rounded-lg text-sm flex items-center gap-3">
-                  <Highlighter size={16} />
-                  <span>
-                    Click the customer text above to highlight and save to your notebook.
+              {item.type === 'call' && (
+                <div className="mt-6 p-4 bg-blue-50 text-blue-800 rounded-lg text-sm flex items-center justify-between gap-3">
+                  <span className="flex items-center gap-3">
+                    <Highlighter size={16} />
+                    <span>Save this call transcript to your notebook.</span>
                   </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onAddToNotebook(item, getCallTranscriptText(item as CallTranscript))
+                    }
+                    className="inline-flex items-center gap-1.5 bg-slate-800 text-white text-xs px-3 py-1.5 rounded shadow hover:bg-slate-700"
+                  >
+                    <Plus size={12} /> Add to Notebook
+                  </button>
                 </div>
               )}
             </div>

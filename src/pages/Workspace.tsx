@@ -1,7 +1,7 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { WidgetEditor } from '@/components/workspace/WidgetEditor'
 import { Workbench } from '@/components/workspace/Workbench'
-import type { ActiveFilter } from '@/types'
+import type { ActiveFilter, GlobalFilter } from '@/types'
 
 const WIDGET_TITLES: Record<string, string> = {
   rating: 'Review rating breakdown',
@@ -20,7 +20,9 @@ export function Workspace() {
   const { widgetId } = useParams<{ widgetId: string }>()
   const navigate = useNavigate()
   const location = useLocation()
-  const initialFilter = (location.state as { initialFilter?: ActiveFilter } | null)?.initialFilter
+  const state = location.state as { initialFilter?: ActiveFilter; dashboardFilters?: GlobalFilter[] } | null
+  const initialFilter = state?.initialFilter
+  const dashboardFilters = state?.dashboardFilters ?? []
 
   const id = widgetId ?? 'issues'
   const title = WIDGET_TITLES[id] ?? 'Workspace'
@@ -41,14 +43,12 @@ export function Workspace() {
           title={title}
           onSave={handleSaveWidget}
         />
-        <span className="text-xs text-gray-500">
-          Edit widget above · Raw data in the list below (survey, call, social, reviews)
-        </span>
       </div>
       <div className="flex-grow min-h-0">
         <Workbench
           entryMode={entryMode}
           initialFilter={initialFilter}
+          initialGlobalFilters={dashboardFilters}
           focusOnData={focusOnData}
           onBack={handleBack}
         />

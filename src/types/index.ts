@@ -13,9 +13,17 @@ export interface Widget {
   dataKey?: string
 }
 
+// Optional attributes from customer interaction data (e.g. JSON import)
+export interface InteractionAttributes {
+  loyaltyTier?: string
+  couponUsed?: boolean
+  orderItem?: string
+  emotion?: string
+}
+
 // Customer interaction – base
 export interface InteractionBase {
-  id: number
+  id: number | string
   type: 'survey' | 'call' | 'social' | 'review'
   category: string
   sentiment: 'Negative' | 'Neutral' | 'Positive'
@@ -23,6 +31,7 @@ export interface InteractionBase {
   channel: string
   topic: string
   nps?: number | null
+  attributes?: InteractionAttributes
 }
 
 export interface SurveyResponse extends InteractionBase {
@@ -30,10 +39,18 @@ export interface SurveyResponse extends InteractionBase {
   text: string
 }
 
+export interface TranscriptEntry {
+  time: string
+  speaker: string
+  type: string
+  text: string
+}
+
 export interface CallTranscript extends InteractionBase {
   type: 'call'
-  transcript: string
+  transcript: string | TranscriptEntry[]
   duration?: string
+  rawText?: string
 }
 
 export interface SocialPost extends InteractionBase {
@@ -54,6 +71,12 @@ export type CustomerInteraction =
 
 // Filter state
 export interface ActiveFilter {
+  type: string
+  value: string
+}
+
+export interface GlobalFilter {
+  id: string
   type: string
   value: string
 }

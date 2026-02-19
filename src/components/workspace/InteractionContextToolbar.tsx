@@ -41,10 +41,17 @@ export function InteractionContextToolbar({ item }: InteractionContextToolbarPro
           <button
             key={id}
             type="button"
-            onClick={() => setActiveView(id)}
+            onClick={() => {
+              if (activeView === id) {
+                setExpanded((e) => !e)
+              } else {
+                setActiveView(id)
+                setExpanded(true)
+              }
+            }}
             title={label}
             className={`p-2.5 rounded-lg transition-colors ${
-              activeView === id ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+              expanded && activeView === id ? 'bg-blue-100 text-blue-600' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
             }`}
           >
             <Icon size={18} />
