@@ -46,6 +46,7 @@ export function Workspace() {
       </div>
       <div className="flex-grow min-h-0">
         <Workbench
+          widgetTitle={title}
           entryMode={entryMode}
           initialFilter={initialFilter}
           initialGlobalFilters={dashboardFilters}

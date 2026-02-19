@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { ArrowLeft, Database, Settings, Layout, Columns } from 'lucide-react'
+import { ArrowLeft, Settings, Layout, Columns } from 'lucide-react'
 import { SmartShelf } from './SmartShelf'
 import { ChartArea } from './ChartArea'
 import { FacetRibbon } from './FacetRibbon'
@@ -25,6 +25,7 @@ function getSearchableText(d: CustomerInteraction): string {
   return `${text} ${meta}`.toLowerCase()
 }
 import { TopToolBar } from './TopToolBar'
+import { Breadcrumb } from './Breadcrumb'
 
 const DEFAULT_DASHBOARD_FILTERS: GlobalFilter[] = [
   { id: 'survey-meta', type: 'Dataset', value: 'Survey metadata' },
@@ -34,6 +35,8 @@ const DEFAULT_DASHBOARD_FILTERS: GlobalFilter[] = [
 
 interface WorkbenchProps {
   entryMode: 'widget' | 'feedback' | 'segment'
+  /** Widget title for breadcrumb (e.g. "Top 5 Issues"). */
+  widgetTitle?: string
   initialFilter?: ActiveFilter | null
   initialGlobalFilters?: GlobalFilter[]
   focusOnData?: boolean
@@ -42,6 +45,7 @@ interface WorkbenchProps {
 
 export function Workbench({
   entryMode,
+  widgetTitle = 'Workspace',
   initialFilter,
   initialGlobalFilters = [],
   focusOnData = false,
@@ -182,19 +186,26 @@ export function Workbench({
   return (
     <div className="h-full flex flex-col bg-slate-50 relative overflow-hidden">
       <div className="h-14 bg-white border-b border-gray-200 flex justify-between items-center px-4 shadow-sm z-10 flex-shrink-0">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 min-w-0">
           <button
             type="button"
             onClick={onBack}
-            className="flex items-center gap-2 text-gray-500 hover:text-gray-900 text-sm font-medium"
+            className="flex items-center gap-2 text-gray-500 hover:text-gray-900 text-sm font-medium shrink-0"
           >
             <ArrowLeft size={16} /> Dashboard
           </button>
-          <div className="h-4 w-px bg-gray-300" />
-          <h2 className="font-semibold text-gray-700 flex items-center gap-2">
-            <Database size={16} className="text-blue-500" />
-            Analysis: {isFeedbackMode ? 'Customer Feedback' : 'Top Issues'}
-          </h2>
+          <div className="h-4 w-px bg-gray-300 shrink-0" />
+          <Breadcrumb
+            segments={
+              selectedItem
+                ? [widgetTitle, 'All Interactions', String(selectedItem.id)]
+                : [widgetTitle, 'All Interactions']
+            }
+            onSegmentClick={(index) => {
+              if (index === 0) setSelectedItem(null)
+              if (index === 1) setSelectedItem(null)
+            }}
+          />
         </div>
 
         <div className="flex items-center gap-4">
